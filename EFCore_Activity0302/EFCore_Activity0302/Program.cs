@@ -1,6 +1,7 @@
 ﻿
 using EFCore_Activity0302;
 using EFCore_DBLibrary;
+using InventoryHelpers;
 using InventoryModels;
 //using System.Linq;
 using Microsoft.EntityFrameworkCore;

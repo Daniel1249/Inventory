@@ -35,7 +35,7 @@ namespace EFCore_DBLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Items");
+                    b.ToTable("Items", (string)null);
                 });
 #pragma warning restore 612, 618
         }

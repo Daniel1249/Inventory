@@ -62,7 +62,7 @@ namespace EFCore_Activity0302
                         LastModifiedUserId = "123",
                         LastModifiedDate = DateTime.Now,
                         Notes = notes,
-                        Quantity = r.Next()
+                        Quantity = r.Next(1, 1000)
                     };
                     db.Items.Add(item);
                     db.SaveChanges();

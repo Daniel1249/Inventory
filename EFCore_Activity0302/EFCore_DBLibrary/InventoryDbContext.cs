@@ -23,6 +23,8 @@ namespace EFCore_DBLibrary
         }
 
         public DbSet<Item> Items { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<CategoryDetail> CategoryDetails { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -36,6 +38,26 @@ namespace EFCore_DBLibrary
                 var cnstr = _configuration.GetConnectionString("InventoryManager");
                 optionsBuilder.UseSqlServer(cnstr);
             }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Item>()
+            .HasMany(x => x.Players)
+            .WithMany(p => p.Items)
+            .UsingEntity<Dictionary<string, object>>(
+            "ItemPlayers",
+            ip => ip.HasOne<Player>()
+            .WithMany()
+            .HasForeignKey("PlayerId")
+            .HasConstraintName("FK_ItemPlayer_Players_PlayerId")
+            .OnDelete(DeleteBehavior.Cascade),
+            ip => ip.HasOne<Item>()
+            .WithMany()
+            .HasForeignKey("ItemId")
+            .HasConstraintName("FK_PlayerItem_Items_ItemId")
+            .OnDelete(DeleteBehavior.ClientCascade)
+            );
         }
 
         /*
@@ -85,8 +107,5 @@ namespace EFCore_DBLibrary
             }
             return base.SaveChanges();
         }
-
-
-
     }
 }

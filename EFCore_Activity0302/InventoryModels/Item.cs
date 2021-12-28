@@ -25,5 +25,10 @@ namespace InventoryModels
 
         [Range(InventoryModelsConstants.MINIMUM_PRICE, InventoryModelsConstants.MAXIMUM_PRICE)]
         public decimal? CurrentOrFinalPrice { get; set; }
+
+        public int? CategoryId { get; set; }
+        public virtual Category Category { get; set; }
+
+        public virtual List<Player> Players { get; set; } = new List<Player>();
     }
 }

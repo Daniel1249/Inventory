@@ -25,6 +25,7 @@ namespace EFCore_DBLibrary
         public DbSet<Item> Items { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryDetail> CategoryDetails { get; set; }
+        public DbSet<Genre> Genres { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

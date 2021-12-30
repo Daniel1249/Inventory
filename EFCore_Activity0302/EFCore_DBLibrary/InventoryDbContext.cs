@@ -1,4 +1,5 @@
 ﻿using InventoryModels;
+using InventoryModels.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -26,6 +27,7 @@ namespace EFCore_DBLibrary
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryDetail> CategoryDetails { get; set; }
         public DbSet<Genre> Genres { get; set; }
+        public DbSet<GetItemsForListingDto> ItemsForListing { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -59,6 +61,12 @@ namespace EFCore_DBLibrary
             .HasConstraintName("FK_PlayerItem_Items_ItemId")
             .OnDelete(DeleteBehavior.ClientCascade)
             );
+
+            modelBuilder.Entity<GetItemsForListingDto>(x =>
+            {
+                x.HasNoKey();
+                x.ToView("ItemsForListing");
+            });
         }
 
         /*

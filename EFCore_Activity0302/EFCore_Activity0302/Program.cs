@@ -6,6 +6,7 @@ using InventoryModels;
 //using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Data.SqlClient;
 
 namespace EFCore_Activity0302
 {
@@ -18,10 +19,12 @@ namespace EFCore_Activity0302
         static void Main(string[] args)
         {
             BuildOptions();
-            EnsureItems();
-            UpdateItems();
+            EnsureCategory();
+            //EnsureItems();
+           UpdateItems();
             //DeleteAllItems();
-            ListInventory();
+            //ListInventory();
+            GetItemsForListing();
         }
         static void BuildOptions()
         {
@@ -41,7 +44,44 @@ namespace EFCore_Activity0302
             EnsureItem("Star Wars: The Empire Strikes Back4", "He will join us or die, master", "Harrison Ford, Carrie Fisher, Mark Hamill");
            
             EnsureItem("Top Gun5", "I feel the need, the need for speed!", "Tom Cruise, Anthony Edwards, Val Kilmer");
-}
+        }
+
+        static void EnsureCategory()
+        {
+            EnsureCategory("Movies");
+        }
+
+        private static void EnsureCategory(string name)
+        {
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                //determine if category exists:
+                var existingCategory = db.Categories.FirstOrDefault(x => x.Name.ToLower() == name.ToLower());
+
+                if(existingCategory == null)
+                {
+                    //doesn't esist, add it
+                    db.Categories.AddRange(
+                    new Category()
+                    {
+                        CreatedDate = DateTime.Now,
+                        IsActive = true,
+                        LastModifiedUserId = _loggedInUserId,
+
+                        IsDeleted = false,
+                        Name = name,
+                        CategoryDetail = new CategoryDetail()
+                        {
+                            ColorValue = "#0000FF",
+                            ColorName = "Blue"
+                        }
+                    });
+                    
+                    db.SaveChanges();
+                }
+            }
+        }
+
         private static void EnsureItem(string name, string description, string notes)
         {
             Random r = new Random();
@@ -62,7 +102,9 @@ namespace EFCore_Activity0302
                         LastModifiedUserId = "123",
                         LastModifiedDate = DateTime.Now,
                         Notes = notes,
-                        Quantity = r.Next(1, 1000)
+                        Quantity = r.Next(1, 1000),
+                        
+                        CategoryId = 9
                     };
                     db.Items.Add(item);
                     db.SaveChanges();
@@ -78,6 +120,25 @@ namespace EFCore_Activity0302
                 items.ForEach(x => Console.WriteLine($"New Item: {x.Name}"));
             }
         }
+
+        private static void GetItemsForListing()
+        {
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                var results = db.ItemsForListing.FromSqlRaw("EXECUTE dbo.GetItemsForListing").ToList();
+            foreach (var item in results)
+                {
+                    var output = $"ITEM {item.Name}] {item.Description}";
+                    if (!string.IsNullOrWhiteSpace(item.CategoryName))
+                    {
+                        output = $"{output} has category: {item.CategoryName}";
+                    }
+                    Console.WriteLine(output);
+                }
+            }
+        }
+
+
         private static void DeleteAllItems()
         {
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
@@ -95,7 +156,8 @@ namespace EFCore_Activity0302
                 var items = db.Items.ToList();
                 foreach (var item in items)
                 {
-                    item.CurrentOrFinalPrice = 9.99M;
+                    item.CurrentOrFinalPrice = 8.88M;
+                    item.CategoryId = 9;
                 }
                 db.Items.UpdateRange(items);
                 db.SaveChanges();

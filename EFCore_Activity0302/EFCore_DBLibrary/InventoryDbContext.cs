@@ -29,6 +29,10 @@ namespace EFCore_DBLibrary
         public DbSet<Genre> Genres { get; set; }
         public DbSet<GetItemsForListingDto> ItemsForListing { get; set; }
 
+        public DbSet<AllItemsPipeDelimitedStringDto> AllItemsOutput { get; set; }
+
+        public DbSet<GetItemsTotalValueDto> GetItemsTotalValues { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -67,6 +71,72 @@ namespace EFCore_DBLibrary
                 x.HasNoKey();
                 x.ToView("ItemsForListing");
             });
+
+            modelBuilder.Entity<AllItemsPipeDelimitedStringDto>(x => {
+                x.HasNoKey();
+                x.ToView("AllItemsOutput");
+            });
+
+            modelBuilder.Entity<GetItemsTotalValueDto>(x =>
+            {
+                x.HasNoKey();
+                x.ToView("GetItemsTotalValues");
+            });
+
+            //SEED DATA FOR GENRE tabel
+
+            var genreCreateDate = new DateTime(2021, 01, 01);
+            modelBuilder.Entity<Genre>(x =>
+            {
+                x.HasData(
+                new Genre()
+                {
+                    Id = 1,
+                    CreatedDate = genreCreateDate,
+                    IsActive =
+               true,
+                    IsDeleted = false,
+                    Name = "Fantasy"
+                },
+                new Genre()
+                {
+                    Id = 2,
+                    CreatedDate = genreCreateDate,
+                    IsActive =
+               true,
+                    IsDeleted = false,
+                    Name = "Sci/Fi"
+                },
+                new Genre()
+                {
+                    Id = 3,
+                    CreatedDate = genreCreateDate,
+                    IsActive =
+               true,
+                    IsDeleted = false,
+                    Name = "Horror"
+                },
+                new Genre()
+                {
+                    Id = 4,
+                    CreatedDate = genreCreateDate,
+                    IsActive =
+               true,
+                    IsDeleted = false,
+                    Name = "Comedy"
+                },
+                new Genre()
+                {
+                    Id = 5,
+                    CreatedDate = genreCreateDate,
+                    IsActive =
+               true,
+                    IsDeleted = false,
+                    Name = "Drama"
+                }
+                );
+            });
+            
         }
 
         /*

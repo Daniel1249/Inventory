@@ -7,11 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\Functions\GetItemsTotalValue\GetItemsTotalValue.v0.sql" />
+    <None Remove="Scripts\Functions\ItemNamesPipeDelimitedString\ItemNamesPipeDelimitedString.v0.sql" />
     <None Remove="Scripts\Procedures\GetItemsForListing\GetItemsForListing.v0.sql" />
     <None Remove="Scripts\Procedures\GetItemsForListing\GetItemsForListing.v1.sql" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Scripts\Functions\GetItemsTotalValue\GetItemsTotalValue.v0.sql" />
+    <EmbeddedResource Include="Scripts\Functions\ItemNamesPipeDelimitedString\ItemNamesPipeDelimitedString.v0.sql" />
     <EmbeddedResource Include="Scripts\Procedures\GetItemsForListing\GetItemsForListing.v0.sql" />
     <EmbeddedResource Include="Scripts\Procedures\GetItemsForListing\GetItemsForListing.v1.sql" />
   </ItemGroup>

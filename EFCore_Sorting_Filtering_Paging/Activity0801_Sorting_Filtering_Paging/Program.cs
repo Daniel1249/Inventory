@@ -15,13 +15,19 @@ namespace Activity0801_Sorting_Filtering_Paging
         static void Main(string[] args)
         {
             BuildOptions();
-            ListPeopleThenOrderAndTake();
-            QueryPeopleOrderedToListAndTake();
+            //ListPeopleThenOrderAndTake();
+            //QueryPeopleOrderedToListAndTake();
 
             Console.WriteLine("Please Enter the partial First or Last Name, or the Person Type to search for:");
                     var result = Console.ReadLine();
-                    FilteredPeople(result);
+                    //FilteredPeople(result);
 
+            int pageSize = 7;
+            for (int pageNumber = 0; pageNumber < 10; pageNumber++)
+            {
+                Console.WriteLine($"Page {pageNumber + 1}");
+                FilteredAndPagedResult(result, pageNumber, pageSize);
+            }
         }
 
         static void BuildOptions()
@@ -31,6 +37,26 @@ namespace Activity0801_Sorting_Filtering_Paging
             _optionsBuilder.UseSqlServer(_configuration.GetConnectionString("AdventureWorks"));
         }
 
+        private static void FilteredAndPagedResult(string filter, int pageNumber, int pageSize)
+        {
+            using (var db = new AdventureWorksContext(_optionsBuilder.Options))
+            {
+                var searchTerm = filter.ToLower();
+                var query = db.Person.Where(x => x.LastName.ToLower().
+                Contains(searchTerm)
+                || x.FirstName.ToLower().
+                Contains(searchTerm)
+                || x.PersonType.ToLower().
+                Equals(searchTerm))
+                .OrderBy(x => x.LastName)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize);
+                foreach (var person in query)
+                {
+                    Console.WriteLine($"{person.FirstName} {person.LastName}, { person.PersonType}");
+                }
+            }
+        }
         private static void FilteredPeople(string filter)
         {
             using (var db = new AdventureWorksContext(_optionsBuilder.Options))

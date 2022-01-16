@@ -18,6 +18,10 @@ namespace Activity0801_Sorting_Filtering_Paging
             ListPeopleThenOrderAndTake();
             QueryPeopleOrderedToListAndTake();
 
+            Console.WriteLine("Please Enter the partial First or Last Name, or the Person Type to search for:");
+                    var result = Console.ReadLine();
+                    FilteredPeople(result);
+
         }
 
         static void BuildOptions()
@@ -25,6 +29,24 @@ namespace Activity0801_Sorting_Filtering_Paging
             _configuration = ConfigurationBuilderSingleton.ConfigurationRoot;
             _optionsBuilder = new DbContextOptionsBuilder<AdventureWorksContext>();
             _optionsBuilder.UseSqlServer(_configuration.GetConnectionString("AdventureWorks"));
+        }
+
+        private static void FilteredPeople(string filter)
+        {
+            using (var db = new AdventureWorksContext(_optionsBuilder.Options))
+            {
+                var searchTerm = filter.ToLower();
+                var query = db.Person.Where(x => x.LastName.ToLower().
+                Contains(searchTerm)
+                || x.FirstName.ToLower().
+                Contains(searchTerm)
+                || x.PersonType.ToLower().
+                Equals(searchTerm));
+                foreach (var person in query)
+                {
+                    Console.WriteLine($"{person.FirstName} {person.LastName},{ person.PersonType}");
+                }
+            }
         }
 
         private static void ListPeopleThenOrderAndTake()

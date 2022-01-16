@@ -3,7 +3,7 @@ using EFCore_Activity0302;
 using EFCore_DBLibrary;
 using InventoryHelpers;
 using InventoryModels;
-//using System.Linq;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Data.SqlClient;
@@ -19,16 +19,20 @@ namespace EFCore_Activity0302
         static void Main(string[] args)
         {
             BuildOptions();
-            EnsureCategory();
+            //EnsureCategory();
             //EnsureItems();
-           UpdateItems();
-            //DeleteAllItems();
+           //UpdateItems();
+           //DeleteAllItems();
+
             //ListInventory();
+
             //GetItemsForListing();
 
-            GetItemsTotalValues();
+            //GetItemsTotalValues();
 
             //GetAllActiveItemsAsPipeDelimitedString();
+
+            GetFullItemDetails();
         }
         static void BuildOptions()
         {
@@ -116,6 +120,29 @@ namespace EFCore_Activity0302
             }
         }
 
+        private static void GetFullItemDetails()
+        {
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                var results = db.DetailedItems.ToList();
+
+                
+                var result = db.FullItemDetailDtos
+                .FromSqlRaw("SELECT * FROM [dbo].[vwFullItemDetails] " + "ORDER BY ItemName, GenreName,Category, PlayerName ")
+                .ToList();
+                foreach (var item in result)
+                {
+                    Console.WriteLine($"New Item] {item.Id,-10}" +
+                    $"|{item.ItemName,-50}" +
+                    $"|{item.ItemDescription,-4}" +
+                    $"|{item.PlayerName,-5}" +
+                    $"|{item.Category,-5}" +
+                    $"|{item.GenreName,-5}");
+                }
+                
+            }
+        }
+
         private static void GetAllActiveItemsAsPipeDelimitedString()
         {
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
@@ -135,14 +162,29 @@ namespace EFCore_Activity0302
             {
                 var items = db.Items.OrderBy(x => x.Name).ToList();
 
-                items.ForEach(x => Console.WriteLine($"New Item: {x.Name}"));
+                items.ForEach(x => Console.WriteLine($"New Item: {x.Name}" + $"Item Description: {x.Description}"));
             }
         }
+
+
+        private static void GetItemsForListing2()
+        {
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                var results = db.Items.FromSqlRaw("EXECUTE dbo.GetItemsForListing").ToList();
+                foreach (var item in results)
+                {
+                    Console.WriteLine($"ITEM {item.Id}] {item.Name}");
+                }
+            }
+        }
+
 
         private static void GetItemsForListing()
         {
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
             {
+                
                 var results = db.ItemsForListing.FromSqlRaw("EXECUTE dbo.GetItemsForListing").ToList();
             foreach (var item in results)
                 {

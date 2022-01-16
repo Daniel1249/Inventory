@@ -33,6 +33,10 @@ namespace EFCore_DBLibrary
 
         public DbSet<GetItemsTotalValueDto> GetItemsTotalValues { get; set; }
 
+        public DbSet<FullItemDetailDTO> FullItemDetailDtos { get; set; }
+
+        public DbSet<DetailedItemView> DetailedItems { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -49,6 +53,18 @@ namespace EFCore_DBLibrary
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<FullItemDetailDTO>(x =>
+            {
+                x.HasNoKey();
+                x.ToView("FullItemDetailDtos");
+            });
+
+            modelBuilder.Entity<GetItemsForListingDto>(x =>
+            {
+                x.HasNoKey();
+                x.ToView("ItemsForListing");
+            });
+
             modelBuilder.Entity<Item>()
             .HasMany(x => x.Players)
             .WithMany(p => p.Items)
@@ -65,6 +81,12 @@ namespace EFCore_DBLibrary
             .HasConstraintName("FK_PlayerItem_Items_ItemId")
             .OnDelete(DeleteBehavior.ClientCascade)
             );
+
+            modelBuilder.Entity<FullItemDetailDTO>(x =>
+            {
+                x.HasNoKey();
+                x.ToView("FullItemDetailDtos");
+            });
 
             modelBuilder.Entity<GetItemsForListingDto>(x =>
             {
@@ -92,6 +114,8 @@ namespace EFCore_DBLibrary
                 new Genre()
                 {
                     Id = 1,
+                    CreatedByUserId="12",
+                    LastModifiedUserId="13",
                     CreatedDate = genreCreateDate,
                     IsActive =
                true,
@@ -101,6 +125,8 @@ namespace EFCore_DBLibrary
                 new Genre()
                 {
                     Id = 2,
+                    CreatedByUserId = "12",
+                    LastModifiedUserId = "13",
                     CreatedDate = genreCreateDate,
                     IsActive =
                true,
@@ -110,6 +136,8 @@ namespace EFCore_DBLibrary
                 new Genre()
                 {
                     Id = 3,
+                    CreatedByUserId = "12",
+                    LastModifiedUserId = "13",
                     CreatedDate = genreCreateDate,
                     IsActive =
                true,
@@ -119,6 +147,8 @@ namespace EFCore_DBLibrary
                 new Genre()
                 {
                     Id = 4,
+                    CreatedByUserId = "12",
+                    LastModifiedUserId = "13",
                     CreatedDate = genreCreateDate,
                     IsActive =
                true,
@@ -128,6 +158,8 @@ namespace EFCore_DBLibrary
                 new Genre()
                 {
                     Id = 5,
+                    CreatedByUserId = "12",
+                    LastModifiedUserId = "13",
                     CreatedDate = genreCreateDate,
                     IsActive =
                true,

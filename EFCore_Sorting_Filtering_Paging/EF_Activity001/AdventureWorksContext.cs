@@ -8,6 +8,8 @@ namespace EF_Activity001
     {
         public AdventureWorksContext()
         {
+            //Add this here to assure that TrackingBehavior is disable for all entities;
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public AdventureWorksContext(DbContextOptions<AdventureWorksContext> options)

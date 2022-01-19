@@ -7,6 +7,9 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Data.SqlClient;
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+using InventoryModels.DTOs;
 
 namespace EFCore_Activity0302
 {
@@ -16,15 +19,21 @@ namespace EFCore_Activity0302
         private static DbContextOptionsBuilder<InventoryDbContext> _optionsBuilder;
         private const string _systemUserId = "2fd28110-93d0-427d-9207-d55dbca680fa";
         private const string _loggedInUserId = "e2eb8989-a81a-4151-8e86-eb95a7961da2";
+
+        //for AutoMapper config
+        private static MapperConfiguration _mapperConfig;
+        private static IMapper _mapper;
+        private static IServiceProvider _serviceProvider;
         static void Main(string[] args)
         {
             BuildOptions();
+            BuildMapper();
             //EnsureCategory();
             //EnsureItems();
            //UpdateItems();
            //DeleteAllItems();
 
-            //ListInventory();
+            ListInventory();
 
             //GetItemsForListing();
 
@@ -32,13 +41,28 @@ namespace EFCore_Activity0302
 
             //GetAllActiveItemsAsPipeDelimitedString();
 
-            GetFullItemDetails();
+            //GetFullItemDetails();
         }
         static void BuildOptions()
         {
             _configuration = ConfigurationBuilderSingleton.ConfigurationRoot;
             _optionsBuilder = new DbContextOptionsBuilder<InventoryDbContext>();
             _optionsBuilder.UseSqlServer(_configuration.GetConnectionString("InventoryManager"));
+        }
+
+        static void BuildMapper()
+        {
+            var services = new ServiceCollection();
+            services.AddAutoMapper(typeof(InventoryMapper));
+            _serviceProvider = services.BuildServiceProvider();
+
+            //set up the configuration and tell AutoMapper to use the InventoryMapper profile
+            _mapperConfig = new MapperConfiguration(cfg => {
+                cfg.AddProfile<InventoryMapper>();
+            });
+            _mapperConfig.AssertConfigurationIsValid();
+            _mapper = _mapperConfig.CreateMapper();
+
         }
 
         static void EnsureItems()
@@ -155,12 +179,17 @@ namespace EFCore_Activity0302
             }
         }
 
-
+        //this method is using AutoMapper
         private static void ListInventory()
         {
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
             {
+                // var items = db.Items.OrderBy(x => x.Name).ToList();
+
                 var items = db.Items.OrderBy(x => x.Name).ToList();
+                var result = _mapper.Map<List<Item>, List<ItemDto>>(items);
+
+
 
                 items.ForEach(x => Console.WriteLine($"New Item: {x.Name}" + $"Item Description: {x.Description}"));
             }

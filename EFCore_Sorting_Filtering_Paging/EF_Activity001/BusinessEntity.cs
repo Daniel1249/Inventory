@@ -24,6 +24,8 @@ namespace EF_Activity001
 
         [InverseProperty("BusinessEntity")]
         public virtual Person Person { get; set; }
+
+
         [InverseProperty("BusinessEntity")]
         public virtual Store Store { get; set; }
         [InverseProperty("BusinessEntity")]

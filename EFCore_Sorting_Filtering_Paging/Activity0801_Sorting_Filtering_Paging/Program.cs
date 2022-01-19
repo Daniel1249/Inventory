@@ -1,4 +1,5 @@
 ﻿using EF_Activity001;
+using EF_Activity001.DTOs;
 using InventoryHelpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -34,9 +35,98 @@ namespace Activity0801_Sorting_Filtering_Paging
             */
 
 
-            ShowAllSalespeopleUsingProjection();
+            //ShowAllSalespeopleUsingProjection();
+
+            GenerateSalesReportData();
+
+            GenerateSalesReportDataToDTO();
         }
 
+
+        //this method is using a Dto for view
+        public static void GenerateSalesReportDataToDTO()
+        {
+            Console.WriteLine("What is the minimum amount of sales?");
+            var input = Console.ReadLine();
+            decimal filter = 0.0m;
+            if (!decimal.TryParse(input, out filter))
+            {
+                Console.WriteLine("Bad input");
+                return;
+            }
+            using (var db = new AdventureWorksContext(_optionsBuilder.Options))
+            {
+                var salesReportData = db.SalesPerson.Select(sp => new SalesReportListingDto
+                {
+                    BusinessEntityId = sp.BusinessEntityId,
+                    FirstName = sp.BusinessEntity.BusinessEntity.FirstName,
+                    LastName = sp.BusinessEntity.BusinessEntity.LastName,
+                    SalesYtd = sp.SalesYtd,
+                    Territories = sp.SalesTerritoryHistory
+                    .Select(y => y.Territory.Name),
+                    TotalOrders = sp.SalesOrderHeader.Count(),
+                    TotalProductsSold = sp.SalesOrderHeader
+                    .SelectMany(y => y.SalesOrderDetail)
+                    .Sum(z => z.OrderQty)
+                }).Where(srdata => srdata.SalesYtd > filter)
+                    .OrderBy(srds => srds.LastName)
+                    .ThenBy(srds => srds.FirstName)
+                    .ThenByDescending(srds => srds.SalesYtd);
+                    //.ToList();
+
+                foreach (var srd in salesReportData)
+                {
+                    Console.WriteLine(srd.ToString());
+                }
+
+            }
+        }
+
+        //this method is using an anonymous class
+        private static void GenerateSalesReportData()
+        {
+
+            Console.WriteLine("What is the minimum amount of sales?");
+            var input = Console.ReadLine();
+            decimal filter = 0.0m;
+            if (!decimal.TryParse(input, out filter))
+            {
+                Console.WriteLine("Bad input");
+                return;
+            }
+            using (var db = new AdventureWorksContext(_optionsBuilder.Options))
+            {
+                var salesReportData = db.SalesPerson.Select(sp => new
+                {
+                    beid = sp.BusinessEntityId,
+                    sp.BusinessEntity.BusinessEntity.FirstName,
+                    sp.BusinessEntity.BusinessEntity.LastName,
+                    sp.SalesYtd,
+                    Territories = sp.SalesTerritoryHistory
+                    
+
+                .Select(y => y.Territory.Name),
+                  OrderCount = sp.SalesOrderHeader.Count(),
+                  TotalProductsSold = sp.SalesOrderHeader
+                                        .SelectMany(y => y.SalesOrderDetail)
+                                        .Sum(z => z.OrderQty)
+                })
+                .Where(srdata => srdata.SalesYtd > filter)
+
+                .OrderBy(srds => srds.LastName)
+                .ThenBy(srds => srds.FirstName)
+                .ThenByDescending(srds => srds.SalesYtd)
+                .ToList();
+                foreach (var srd in salesReportData)
+                {
+                    Console.WriteLine($"{srd.beid}| {srd.LastName}, {srd.FirstName} |" +
+                                        $"YTD Sales: {srd.SalesYtd} |" +
+                                        $"{string.Join(',', srd.Territories)} |" +
+                                        $"Order Count: {srd.OrderCount}|" +
+                                        $"Products Sold: {srd.TotalProductsSold}");
+                }
+            }
+        }
         private static void ShowAllSalespeopleUsingProjection()
         {
             using (var db = new AdventureWorksContext(_optionsBuilder.Options))

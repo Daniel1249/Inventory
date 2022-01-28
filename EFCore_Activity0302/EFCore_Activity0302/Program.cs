@@ -42,13 +42,13 @@ namespace EFCore_Activity0302
 
             //GetItemsTotalValues();
 
-            //GetAllActiveItemsAsPipeDelimitedString();
+           // GetAllActiveItemsAsPipeDelimitedString();
 
-            //GetFullItemDetails();
+            GetFullItemDetails();
 
             //ListInventoryWithProjection();
 
-            ListCategoriesAndColors();
+            //ListCategoriesAndColors();
         }
 
 
@@ -97,10 +97,13 @@ namespace EFCore_Activity0302
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
             {
                 var items = db.Items
-                .OrderBy(x => x.Name)
+                //.OrderBy(x => x.Name)
                 .ProjectTo<ItemDto>(_mapper.ConfigurationProvider)
                 .ToList();
-                items.ForEach(x => Console.WriteLine($"New Item: {x}"));
+
+                //items.ForEach(x => Console.WriteLine($"New Item: {x}"));
+
+                items.OrderBy(x => x.Name).ToList().ForEach(x => Console.WriteLine($"New Item: {x}"));
             }
 
         }
@@ -188,8 +191,10 @@ namespace EFCore_Activity0302
         {
             var minDateValue = new DateTime(2021, 1, 1);
             var maxDateValue = new DateTime(2024, 1, 1);
+            /* code used without encrition
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
             {
+                
                 var results = db.Items.Select(x => new ItemDto
                 {
                     CreatedDate = x.CreatedDate,
@@ -216,18 +221,51 @@ namespace EFCore_Activity0302
                     Console.WriteLine($"ITEM {item.CategoryName}| {item.Name} - {item.Description}");
                 }
                 */
+
+            //Code used for encryption
+
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                var results = db.Items.Include(x => x.Category).ToList().Select(x =>
+                new ItemDto
+                {
+                    CreatedDate = x.CreatedDate,
+                    CategoryName = x.Category.Name,
+                    Description = x.Description,
+                    IsActive = x.IsActive,
+                    IsDeleted = x.IsDeleted,
+                    Name = x.Name,
+                    Notes = x.Notes,
+                    CategoryId = x.Category.Id,
+                    Id = x.Id
+                }).Where(x => x.CreatedDate >= minDateValue && x.CreatedDate <= maxDateValue)
+                .OrderBy(y => y.CategoryName).ThenBy(z => z.Name)
+                .ToList();
+                foreach (var itemDto in results)
+                {
+                    Console.WriteLine(itemDto);
+                }
             }
         }
+     
         private static void GetFullItemDetails()
         {
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
             {
                 var results = db.DetailedItems.ToList();
 
-
+                /*
+                //used without encryption
                 var result = db.FullItemDetailDtos
                 .FromSqlRaw("SELECT * FROM [dbo].[vwFullItemDetails] " + "ORDER BY ItemName, GenreName,Category, PlayerName ")
                 .ToList();
+                */
+                var result = db.FullItemDetailDtos
+                                .FromSqlRaw("SELECT * FROM [dbo].[vwFullItemDetails]")
+                                .ToList()
+                                .OrderBy(x => x.ItemName).ThenBy(x => x.GenreName)
+                                .ThenBy(x => x.Category).ThenBy(x => x.PlayerName);
+
                 foreach (var item in result)
                 {
                     Console.WriteLine($"New Item] {item.Id,-10}" +
@@ -246,10 +284,19 @@ namespace EFCore_Activity0302
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
             {
                 var isActiveParm = new SqlParameter("IsActive", 1);
+
+                /*
+                //used without encryption
                 var result = db.AllItemsOutput
                                 .FromSqlRaw("SELECT [dbo].[ItemNamesPipeDelimitedString](@IsActive)AllItems", isActiveParm).FirstOrDefault();
 
                 Console.WriteLine($"All active Items: {result.AllItems}");
+                */
+
+                var result = db.Items.Where(x => x.IsActive).ToList();
+                var pipeDelimitedString = string.Join("|", result);
+                Console.WriteLine($"All active Items: {pipeDelimitedString}");
+
             }
         }
 

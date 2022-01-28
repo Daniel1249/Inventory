@@ -4,14 +4,16 @@ using EF_Activity001;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EF_Activity001.Migrations
 {
     [DbContext(typeof(AdventureWorksContext))]
-    partial class AdventureWorksContextModelSnapshot : ModelSnapshot
+    [Migration("20220128181621_EncryptionMigration_Step2_BackupData")]
+    partial class EncryptionMigration_Step2_BackupData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

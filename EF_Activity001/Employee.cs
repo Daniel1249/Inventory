@@ -65,5 +65,19 @@ namespace EF_Activity001
         public virtual ICollection<JobCandidate> JobCandidate { get; set; }
         [InverseProperty("Employee")]
         public virtual ICollection<PurchaseOrderHeader> PurchaseOrderHeader { get; set; }
+
+        //for backup
+        [StringLength(15)]
+        public string NationalIDNumberBackup { get; set; }
+        [StringLength(50)]
+        public string JobTitleBackup { get; set; }
+        [Column(TypeName = "date")]
+        public DateTime BirthDateBackup { get; set; }
+        [StringLength(1)]
+        public string MaritalStatusBackup { get; set; }
+        [StringLength(1)]
+        public string GenderBackup { get; set; }
+        [Column(TypeName = "date")]
+        public DateTime HireDateBackup { get; set; }
     }
 }

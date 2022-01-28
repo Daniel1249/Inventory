@@ -32,6 +32,7 @@ namespace InventoryDataMigrator
                     IsDeleted = false,
                     Name = "Movies",
                     CreatedByUserId="123",
+                    LastModifiedUserId= SEED_USER_ID,
                     CategoryDetail = new CategoryDetail()
                     {
                         ColorValue = "#0000FF",
@@ -45,6 +46,7 @@ namespace InventoryDataMigrator
                     IsDeleted = false,
                     Name = "Books",
                     CreatedByUserId = "123",
+                    LastModifiedUserId = SEED_USER_ID,
                     CategoryDetail = new CategoryDetail()
                     {
                         ColorValue = "#FF0000",
@@ -58,6 +60,7 @@ namespace InventoryDataMigrator
                     IsDeleted = false,
                     Name = "Games",
                     CreatedByUserId = "123",
+                    LastModifiedUserId = SEED_USER_ID,
                     CategoryDetail = new CategoryDetail()
                     {
                         ColorValue = "#008000",

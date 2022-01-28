@@ -22,20 +22,32 @@ namespace InventoryDataMigrator
             if (_context.Items.Count() == 0)
             {
                 _context.Items.AddRange(
-                new Item() {
-                    Name = "Batman Begins", CurrentOrFinalPrice =9.99m, Description = "You either die the hero or live long enough to see yourself become the villain",
-                    IsOnSale = false, Notes = "", PurchasePrice =
-                    23.99m, PurchasedDate = null, Quantity = 1000,
-                    SoldDate = null, CreatedByUserId = SEED_USER_ID,
+                new Item()
+                {
+                    Name = "Batman Begins",
+                    CurrentOrFinalPrice = 9.99m,
+                    Description = "You either die the hero or live long enough to see yourself become the villain",
+                    IsOnSale = false,
+                    Notes = "",
+                    PurchasePrice =
+                    23.99m,
+                    PurchasedDate = null,
+                    Quantity = 1000,
+                    SoldDate = null,
+                    CreatedByUserId = SEED_USER_ID,
                     CreatedDate = DateTime.Now,
                     LastModifiedUserId = SEED_USER_ID,
-                    IsDeleted = false, IsActive = true, Players = new
+                    IsDeleted = false,
+                    CategoryId=15,
+                    IsActive = true,
+                    Players = new
                     List<Player>() {
                     new Player() { CreatedDate = DateTime.
                     Now,IsActive = true,IsDeleted =
-                    false,CreatedByUserId = SEED_USER_ID,
-                    Description = "https://www.imdb.com/name/nm0000288/",Name= "Christian Bale",
-                    LastModifiedUserId=SEED_USER_ID,
+                    false,
+                        CreatedByUserId = SEED_USER_ID,
+                    Description = "https://www.imdb.com/name/nm0000288/",Name= "Christian Bale"
+                    ,LastModifiedUserId=SEED_USER_ID,
                     }
                     }
                 },
@@ -46,7 +58,7 @@ namespace InventoryDataMigrator
                         Description = "You mustn't be afraid to dream a little bigger,darling",
                         IsOnSale = false,
                         Notes = "",
-                        PurchasePrice =4.99m,
+                        PurchasePrice = 4.99m,
                         PurchasedDate = null,
                         Quantity = 1000,
                         SoldDate = null,
@@ -54,6 +66,7 @@ namespace InventoryDataMigrator
                         CreatedDate = DateTime.Now,
                         LastModifiedUserId = SEED_USER_ID,
                         IsDeleted = false,
+                        CategoryId = 16,
                         IsActive = true,
                         Players = new
                         List<Player>() {
@@ -65,15 +78,15 @@ namespace InventoryDataMigrator
                          LastModifiedUserId=SEED_USER_ID}
                         }
                     },
-                    
+
                     new Item()
                     {
                         Name = "Remember the Titans",
-                        CurrentOrFinalPrice= 3.99m,
+                        CurrentOrFinalPrice = 3.99m,
                         Description = "Left Side, Strong Side",
                         IsOnSale = false,
                         Notes = "",
-                        PurchasePrice =7.99m,
+                        PurchasePrice = 7.99m,
                         PurchasedDate = null,
                         Quantity = 1000,
                         SoldDate = null,
@@ -81,6 +94,7 @@ namespace InventoryDataMigrator
                         CreatedDate = DateTime.Now,
                         LastModifiedUserId = SEED_USER_ID,
                         IsDeleted = false,
+                        CategoryId = 17,
                         IsActive = true,
                         Players = new
                     List<Player>() {
@@ -98,7 +112,7 @@ namespace InventoryDataMigrator
                         Description = "He will join us or die,master",
                         IsOnSale = false,
                         Notes = "",
-                        PurchasePrice =35.99m,
+                        PurchasePrice = 35.99m,
                         PurchasedDate = null,
                         Quantity = 1000,
                         SoldDate = null,
@@ -106,14 +120,15 @@ namespace InventoryDataMigrator
                         CreatedDate = DateTime.Now,
                         LastModifiedUserId = SEED_USER_ID,
                         IsDeleted = false,
+                        CategoryId = 15,
                         IsActive = true,
                         Players = new
                     List<Player>() {
                     new Player() { CreatedDate = DateTime.
                     Now,IsActive = true,IsDeleted =
                     false,CreatedByUserId = SEED_USER_ID,
-                    Description = "https://www.imdb.com/name/nm0000434/",Name= "Mark Hamill",
-                     LastModifiedUserId=SEED_USER_ID}
+                    Description = "https://www.imdb.com/name/nm0000434/",Name= "Mark Hamill"
+                    ,LastModifiedUserId=SEED_USER_ID}
                     }
                     },
                     new Item()
@@ -123,7 +138,7 @@ namespace InventoryDataMigrator
                         Description = "I feel the need, the need for speed!",
                         IsOnSale = false,
                         Notes = "",
-                        PurchasePrice =8.99m,
+                        PurchasePrice = 8.99m,
                         PurchasedDate = null,
                         Quantity = 1000,
                         SoldDate = null,
@@ -131,16 +146,130 @@ namespace InventoryDataMigrator
                         CreatedDate = DateTime.Now,
                         LastModifiedUserId = SEED_USER_ID,
                         IsDeleted = false,
+                        CategoryId = 16,
                         IsActive = true,
                         Players = new
-                    List<Player>() {
-                    new Player() { CreatedDate = DateTime.
-                    Now,IsActive = true,IsDeleted =
-                    false,CreatedByUserId = SEED_USER_ID,
-                    Description = "https://www.imdb.com/name/nm0000129/",Name= "Tom Cruise",
-                     LastModifiedUserId=SEED_USER_ID}
-                    }
-                    }
+                            List<Player>() {
+                            new Player() { CreatedDate = DateTime.
+                            Now,IsActive = true,IsDeleted =
+                            false,CreatedByUserId = SEED_USER_ID,
+                            Description = "https://www.imdb.com/name/nm0000129/",Name= "Tom Cruise",
+                             LastModifiedUserId=SEED_USER_ID}
+                        }
+                    },
+                        new Item()
+                        {
+                            Name = "Practical Entity Framework",
+                            CurrentOrFinalPrice = 27.99m,
+                            Description = "The book you are reading on Entity Framework",
+                            IsOnSale = false,
+                            Notes = "",
+                            PurchasePrice = 28.99m,
+                            PurchasedDate = null,
+                            Quantity = 1,
+                            SoldDate = null,
+                            CreatedByUserId = SEED_USER_ID,
+                           
+                            LastModifiedUserId = SEED_USER_ID,
+                            CreatedDate = DateTime.Now,
+                            IsDeleted = false,
+                            CategoryId = 17,
+                            IsActive = true,
+                            Players = new
+                            List<Player>() {
+                                new Player() { CreatedDate = DateTime.Now,
+                                            IsActive =true,
+                                            IsDeleted = false,
+                                            CreatedByUserId = SEED_USER_ID,
+                                            Description = "https://www.linkedin/in/brianlgorman",
+                                            Name = "Brian L. Gorman"
+                                            ,LastModifiedUserId=SEED_USER_ID
+                                        }
+
+                            }
+                        },
+
+
+
+                            new Item()
+                            {
+                                Name = "The Sword of Shannara",
+                                CurrentOrFinalPrice = 9.99m,
+                                Description = "The definitive fantasy book",
+                                IsOnSale = false,
+                                Notes = "",
+                                PurchasePrice = 13.99m,
+                                PurchasedDate = null,
+                                Quantity = 900,
+                                SoldDate = null,
+                                CreatedByUserId = SEED_USER_ID,
+                                
+                                LastModifiedUserId = SEED_USER_ID,
+                                CreatedDate = DateTime.Now,
+                                IsDeleted = false,
+                                CategoryId = 15,
+                                IsActive = true,
+                                Players = new List<Player>() {
+                                new Player() { CreatedDate = DateTime.Now,IsActive =
+                                true,IsDeleted = false,CreatedByUserId = SEED_USER_ID,
+                                Description = "https://www.amazon.com/Sword-Shannara-Terry-Brooks/dp/0345314255",Name = "Terry Brooks"
+                                ,LastModifiedUserId=SEED_USER_ID}
+                                }
+
+                            },
+                                new Item()
+                                {
+                                    Name = "World of Tanks",
+                                    CurrentOrFinalPrice = 0.00m,
+                                    Description = "WWII First person tank shooter",
+                                    IsOnSale = false,
+                                    Notes = "",
+                                    PurchasePrice = 0.00m,
+                                    PurchasedDate =
+                                    null,
+                                    Quantity = 1,
+                                    SoldDate = null,
+                                    CreatedByUserId = SEED_USER_ID,
+                                    
+                                    LastModifiedUserId = SEED_USER_ID,
+                                    CreatedDate = DateTime.Now,
+                                    IsDeleted = false,
+                                    CategoryId = 16,
+                                    IsActive = true,
+                                    Players = new List<Player>() {
+                                    new Player() { CreatedDate = DateTime.Now,IsActive =
+                                    true,IsDeleted = false,CreatedByUserId = SEED_USER_ID,
+                                    Description = "https://worldoftanks.com/",Name = "Wargaming"
+                                    ,LastModifiedUserId=SEED_USER_ID}
+}
+                                },
+                                    new Item()
+                                    {
+                                        Name = "Battlefield 2142",
+                                        CurrentOrFinalPrice = 0.00m,
+                                        Description = "WWII First person tank shooter",
+                                        IsOnSale = false,
+                                        Notes = "Game is no longer active",
+                                        PurchasePrice
+                                        = 50.00m,
+                                        PurchasedDate = null,
+                                        Quantity = 1,
+                                        SoldDate = null,
+                                        CreatedByUserId = SEED_USER_ID,
+                                        
+                                        LastModifiedUserId = SEED_USER_ID,
+                                        CreatedDate = DateTime.Now,
+                                        IsDeleted = false,
+                                        CategoryId = 17,
+                                        IsActive = true,
+                                        Players = new List<Player>() {
+                                        new Player() { CreatedDate = DateTime.Now,IsActive =
+                                        true,IsDeleted = false,CreatedByUserId = SEED_USER_ID,
+                                        Description = "https://en.wikipedia.org/wiki/Battlefield_2142",Name = "ElectronicArts"
+                                        ,LastModifiedUserId=SEED_USER_ID}
+                                        }
+                                    }
+
                     );
                 _context.SaveChanges();
             }

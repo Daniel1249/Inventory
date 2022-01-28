@@ -10,5 +10,8 @@ namespace InventoryModels.DTOs
     {
         public int Id { get; set; }
 
+        public string Category { get; set; }
+        public CategoryDetailDto CategoryDetail { get; set; }
+
     }
 }

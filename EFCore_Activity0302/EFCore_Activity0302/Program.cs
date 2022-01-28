@@ -10,6 +10,7 @@ using Microsoft.Data.SqlClient;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using InventoryModels.DTOs;
+using AutoMapper.QueryableExtensions;
 
 namespace EFCore_Activity0302
 {
@@ -28,12 +29,14 @@ namespace EFCore_Activity0302
         {
             BuildOptions();
             BuildMapper();
+
+            //GetItemsForListingLinq();
             //EnsureCategory();
             //EnsureItems();
-           //UpdateItems();
-           //DeleteAllItems();
+            //UpdateItems();
+            //DeleteAllItems();
 
-            ListInventory();
+            //ListInventory();
 
             //GetItemsForListing();
 
@@ -42,7 +45,14 @@ namespace EFCore_Activity0302
             //GetAllActiveItemsAsPipeDelimitedString();
 
             //GetFullItemDetails();
+
+            //ListInventoryWithProjection();
+
+            ListCategoriesAndColors();
         }
+
+
+
         static void BuildOptions()
         {
             _configuration = ConfigurationBuilderSingleton.ConfigurationRoot;
@@ -57,7 +67,8 @@ namespace EFCore_Activity0302
             _serviceProvider = services.BuildServiceProvider();
 
             //set up the configuration and tell AutoMapper to use the InventoryMapper profile
-            _mapperConfig = new MapperConfiguration(cfg => {
+            _mapperConfig = new MapperConfiguration(cfg =>
+            {
                 cfg.AddProfile<InventoryMapper>();
             });
             _mapperConfig.AssertConfigurationIsValid();
@@ -65,16 +76,44 @@ namespace EFCore_Activity0302
 
         }
 
+        private static void ListCategoriesAndColors()
+        {
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                var results = db.Categories
+                .Include(x => x.CategoryDetail)
+                .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider).
+                ToList();
+
+                foreach (var c in results)
+                {
+                    Console.WriteLine($"Category [{c.Category}] is {c.CategoryDetail.Color}");
+                }
+            }
+        }
+
+        private static void ListInventoryWithProjection()
+        {
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                var items = db.Items
+                .OrderBy(x => x.Name)
+                .ProjectTo<ItemDto>(_mapper.ConfigurationProvider)
+                .ToList();
+                items.ForEach(x => Console.WriteLine($"New Item: {x}"));
+            }
+
+        }
         static void EnsureItems()
         {
             EnsureItem("Batman Begins1", "You either die the hero or live long enough to see yourself become the villain", "Christian Bale, Katie Holmes");
-           
-            EnsureItem("Inception2", "You mustn't be afraid to dream a little bigger, darling", "Leonardo DiCaprio, Tom Hardy, Joseph Gordon - Levitt" );
-           
-            EnsureItem("Remember the Titans3", "Left Side, Strong Side", "Denzel Washington, Will Patton" );
-           
+
+            EnsureItem("Inception2", "You mustn't be afraid to dream a little bigger, darling", "Leonardo DiCaprio, Tom Hardy, Joseph Gordon - Levitt");
+
+            EnsureItem("Remember the Titans3", "Left Side, Strong Side", "Denzel Washington, Will Patton");
+
             EnsureItem("Star Wars: The Empire Strikes Back4", "He will join us or die, master", "Harrison Ford, Carrie Fisher, Mark Hamill");
-           
+
             EnsureItem("Top Gun5", "I feel the need, the need for speed!", "Tom Cruise, Anthony Edwards, Val Kilmer");
         }
 
@@ -90,7 +129,7 @@ namespace EFCore_Activity0302
                 //determine if category exists:
                 var existingCategory = db.Categories.FirstOrDefault(x => x.Name.ToLower() == name.ToLower());
 
-                if(existingCategory == null)
+                if (existingCategory == null)
                 {
                     //doesn't esist, add it
                     db.Categories.AddRange(
@@ -108,7 +147,7 @@ namespace EFCore_Activity0302
                             ColorName = "Blue"
                         }
                     });
-                    
+
                     db.SaveChanges();
                 }
             }
@@ -135,7 +174,7 @@ namespace EFCore_Activity0302
                         LastModifiedDate = DateTime.Now,
                         Notes = notes,
                         Quantity = r.Next(1, 1000),
-                        
+
                         CategoryId = 9
                     };
                     db.Items.Add(item);
@@ -144,13 +183,48 @@ namespace EFCore_Activity0302
             }
         }
 
+        //using direct map into Dto
+        private static void GetItemsForListingLinq()
+        {
+            var minDateValue = new DateTime(2021, 1, 1);
+            var maxDateValue = new DateTime(2024, 1, 1);
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                var results = db.Items.Select(x => new ItemDto
+                {
+                    CreatedDate = x.CreatedDate,
+                    CategoryName = x.Category.Name,
+                    Description = x.Description,
+                    IsActive = x.IsActive,
+                    IsDeleted = x.IsDeleted,
+                    Name = x.Name,
+                    Notes = x.Notes,
+                    CategoryId = x.Category.Id,
+                    Id = x.Id
+                }).Where(x => x.CreatedDate >= minDateValue && x.CreatedDate <= maxDateValue)
+                    .OrderBy(y => y.CategoryName).ThenBy(z => z.Name)
+                    .ToList();
+
+                foreach (var itemDto in results)
+                {
+                    Console.WriteLine(itemDto);
+                }
+
+                /*
+                foreach (var item in results)
+                {
+                    Console.WriteLine($"ITEM {item.CategoryName}| {item.Name} - {item.Description}");
+                }
+                */
+            }
+        }
         private static void GetFullItemDetails()
         {
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
             {
                 var results = db.DetailedItems.ToList();
 
-                
+
                 var result = db.FullItemDetailDtos
                 .FromSqlRaw("SELECT * FROM [dbo].[vwFullItemDetails] " + "ORDER BY ItemName, GenreName,Category, PlayerName ")
                 .ToList();
@@ -163,7 +237,7 @@ namespace EFCore_Activity0302
                     $"|{item.Category,-5}" +
                     $"|{item.GenreName,-5}");
                 }
-                
+
             }
         }
 
@@ -174,7 +248,7 @@ namespace EFCore_Activity0302
                 var isActiveParm = new SqlParameter("IsActive", 1);
                 var result = db.AllItemsOutput
                                 .FromSqlRaw("SELECT [dbo].[ItemNamesPipeDelimitedString](@IsActive)AllItems", isActiveParm).FirstOrDefault();
-                                
+
                 Console.WriteLine($"All active Items: {result.AllItems}");
             }
         }
@@ -213,9 +287,9 @@ namespace EFCore_Activity0302
         {
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
             {
-                
+
                 var results = db.ItemsForListing.FromSqlRaw("EXECUTE dbo.GetItemsForListing").ToList();
-            foreach (var item in results)
+                foreach (var item in results)
                 {
                     var output = $"ITEM {item.Name}] {item.Description}";
                     if (!string.IsNullOrWhiteSpace(item.CategoryName))
@@ -244,7 +318,7 @@ namespace EFCore_Activity0302
                 }
             }
         }
-     
+
 
         private static void DeleteAllItems()
         {

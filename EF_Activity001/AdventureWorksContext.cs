@@ -656,9 +656,9 @@ namespace EF_Activity001
                     .HasName("AK_Employee_LoginID")
                     .IsUnique();
 
-                entity.HasIndex(e => e.NationalIdnumber)
-                    .HasName("AK_Employee_NationalIDNumber")
-                    .IsUnique();
+                //entity.HasIndex(e => e.NationalIdnumber)
+                //    .HasName("AK_Employee_NationalIDNumber")
+                 //   .IsUnique();
 
                 entity.HasIndex(e => e.Rowguid)
                     .HasName("AK_Employee_rowguid")
@@ -668,33 +668,56 @@ namespace EF_Activity001
                     .HasComment("Primary key for Employee records.  Foreign key to BusinessEntity.BusinessEntityID.")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.BirthDate).HasComment("Date of birth.");
+               // entity.Property(e => e.BirthDate).HasComment("Date of birth.");
 
                 entity.Property(e => e.CurrentFlag)
                     .HasDefaultValueSql("((1))")
                     .HasComment("0 = Inactive, 1 = Active");
 
-                entity.Property(e => e.Gender)
-                    .IsFixedLength()
-                    .HasComment("M = Male, F = Female");
+             //   entity.Property(e => e.Gender)
+              //      .IsFixedLength()
+              //      .HasComment("M = Male, F = Female");
 
-                entity.Property(e => e.HireDate).HasComment("Employee hired on this date.");
+               // entity.Property(e => e.HireDate).HasComment("Employee hired on this date.");
 
-                entity.Property(e => e.JobTitle).HasComment("Work title such as Buyer or Sales Representative.");
+              //  entity.Property(e => e.JobTitle).HasComment("Work title such as Buyer or Sales Representative.");
 
                 entity.Property(e => e.LoginId).HasComment("Network login.");
 
-                entity.Property(e => e.MaritalStatus)
-                    .IsFixedLength()
-                    .HasComment("M = Married, S = Single");
+               // entity.Property(e => e.MaritalStatus)
+               //     .IsFixedLength()
+                //    .HasComment("M = Married, S = Single");
 
                 entity.Property(e => e.ModifiedDate)
                     .HasDefaultValueSql("(getdate())")
                     .HasComment("Date and time the record was last updated.");
 
-                entity.Property(e => e.NationalIdnumber).HasComment("Unique national identification number such as a social security number.");
+                entity.Property(e => e.BirthDate)
+                    .HasComment("Date of birth.");
 
-                entity.Property(e => e.OrganizationLevel)
+                entity.Property(e => e.Gender)
+                .IsRequired()
+                .HasComment("M = Male, F = Female");
+
+                entity.Property(e => e.HireDate)
+                .HasComment("Employee hired on this date.");
+
+                entity.Property(e => e.JobTitle)
+                .IsRequired()
+                .HasComment("Work title such as Buyer or Sales Representative.");
+
+                entity.Property(e => e.MaritalStatus)
+                .IsRequired()
+                .HasComment("M = Married, S = Single");
+
+                entity.Property(e => e.NationalIdnumber)
+                .IsRequired()
+                .HasColumnName("NationalIDNumber")
+                .HasComment("Unique national identification number such as a social security number.");
+                
+              //  entity.Property(e => e.NationalIdnumber).HasComment("Unique national identification number such as a social security number.");
+
+                                entity.Property(e => e.OrganizationLevel)
                     .HasComment("The depth of the employee in the corporate hierarchy.")
                     .HasComputedColumnSql("([OrganizationNode].[GetLevel]())");
 

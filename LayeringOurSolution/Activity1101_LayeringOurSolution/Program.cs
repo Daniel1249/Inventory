@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using InventoryBusinessLayer;
 using InventoryDatabaseCore;
 using InventoryHelpers;
 using InventoryModels;
@@ -22,40 +23,145 @@ namespace Activity1101_LayeringOurSolution
         private static IMapper _mapper;
         private static IServiceProvider _serviceProvider;
 
+        private static IItemService _itemsService;
+        private static ICategoriesService _categoriesService;
+
         static void Main(string[] args)
         {
             BuildOptions();
             BuildMapper();
-            //ListInventory();
-            //ListInventoryWithProjection();
-            //ListInventoryWithAlwaysEncrypted();
-            GetItemsForListingWithParams();
-            //AllActiveItemsPipeDelimitedString();
-            GetItemsTotalValues();
-           // GetItemsWithGenres();
-            //GetItemsForListingLinq();
-            //ListCategoriesAndColors();
-        }
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                _itemsService = new ItemService(db, _mapper);
+                _categoriesService = new CategoriesService(db, _mapper);
+                ListInventory();
+                GetItemsForListing();
+                GetAllActiveItemsAsPipeDelimitedString();
+                GetItemsTotalValues();
+                GetFullItemDetails();
+                GetItemsForListingLinq();
+                ListCategoriesAndColors();
+            }
 
-        static void BuildOptions()
+            static void BuildOptions()
+            {
+                _configuration = ConfigurationBuilderSingleton.ConfigurationRoot;
+                _optionsBuilder = new DbContextOptionsBuilder<InventoryDbContext>();
+                _optionsBuilder.UseSqlServer(_configuration.GetConnectionString("InventoryManager"));
+                _mapperConfig = new MapperConfiguration(cfg =>
+                {
+                    cfg.AddProfile<InventoryMapper>();
+                });
+                _mapperConfig.AssertConfigurationIsValid();
+                _mapper = _mapperConfig.CreateMapper();
+            }
+
+            static void BuildMapper()
+            {
+                var services = new ServiceCollection();
+                services.AddAutoMapper(typeof(InventoryMapper));
+                _serviceProvider = services.BuildServiceProvider();
+            }
+
+          
+
+            static void ListInventory()
+            {
+                var result = _itemsService.GetItems();
+                result.ForEach(x => Console.WriteLine($"New Item: {x}"));
+            }
+
+            static void GetItemsForListing()
+            {
+                var results = _itemsService.GetItemsForListingFromProcedure();
+                foreach (var item in results)
+                {
+                    var output = $"ITEM {item.Name}] {item.Description}";
+                    if (!string.IsNullOrWhiteSpace(item.CategoryName))
+                    {
+                        output = $"{output} has category: {item.CategoryName}";
+                    }
+                    Console.WriteLine(output);
+                }
+            }
+
+            static void GetAllActiveItemsAsPipeDelimitedString()
+            {
+                Console.WriteLine($"All active Items: {_itemsService.GetAllItemsPipeDelimitedString()}");
+            }
+
+            static void GetItemsTotalValues()
+            {
+                var results = _itemsService.GetItemsTotalValues(true);
+                foreach (var item in results)
+                {
+                    Console.WriteLine($"New Item] {item.Id,-10}" +
+                    $"|{item.Name,-50}" +
+                    $"|{item.Quantity,-4}" +
+                    $"|{item.TotalValue,-5}");
+                }
+            }
+
+            static void GetFullItemDetails()
+            {
+                var result = _itemsService.GetItemsWithGenresAndCategories();
+                foreach (var item in result)
+                {
+                    Console.WriteLine($"New Item] {item.Id,-10}" +
+                    $"|{item.ItemName,-50}" +
+                    $"|{item.ItemDescription,-4}" +
+                    $"|{item.PlayerName,-5}" +
+                    $"|{item.Category,-5}" +
+                    $"|{item.GenreName,-5}");
+                }
+            }
+
+            static void GetItemsForListingLinq()
+            {
+                var minDateValue = new DateTime(2021, 1, 1);
+                var maxDateValue = new DateTime(2024, 1, 1);
+                var results = _itemsService.GetItemsByDateRange(minDateValue, maxDateValue)
+                .OrderBy(y => y.Name).ThenBy(z => z.Name);
+                foreach (var itemDto in results)
+                {
+                    Console.WriteLine(itemDto);
+                }
+            }
+
+            static void ListCategoriesAndColors()
+            {
+                var results = _categoriesService.ListCategoriesAndDetails();
+               
+                    foreach (var c in results)
+                    {
+                        Console.WriteLine($"Category [{c.Category}] is {c.CategoryDetail.Color}");
+                    }
+                
+            }
+
+        }
+    }
+}
+        /*
+
+            private static void GetFullItemDetails()
         {
-            _configuration = ConfigurationBuilderSingleton.ConfigurationRoot;
-            _optionsBuilder = new DbContextOptionsBuilder<InventoryDbContext>();
-            _optionsBuilder.UseSqlServer(_configuration.GetConnectionString("InventoryManager"));
-            _mapperConfig = new MapperConfiguration(cfg => {
-                cfg.AddProfile<InventoryMapper>();
-            });
-            _mapperConfig.AssertConfigurationIsValid();
-            _mapper = _mapperConfig.CreateMapper();
+            using (var db = new InventoryDbContext(_optionsBuilder.Options))
+            {
+                var result = db.FullItemDetailDtos
+                .FromSqlRaw("SELECT * FROM [dbo].[vwFullItemDetails] " + "ORDER BY ItemName, GenreName,Category, PlayerName ")
+                .ToList();
+                foreach (var item in result)
+                {
+                    Console.WriteLine($"New Item] {item.Id,-10}" +
+                    $"|{item.ItemName,-50}" +
+                    $"|{item.ItemDescription,-4}" +
+                    $"|{item.PlayerName,-5}" +
+                    $"|{item.Category,-5}" +
+                    $"|{item.GenreName,-5}");
+                }
+            }
         }
-
-        static void BuildMapper()
-        {
-            var services = new ServiceCollection();
-            services.AddAutoMapper(typeof(InventoryMapper));
-            _serviceProvider = services.BuildServiceProvider();
-        }
-
         static void ListInventory()
         {
             using (var db = new InventoryDbContext(_optionsBuilder.Options))
@@ -205,3 +311,4 @@ namespace Activity1101_LayeringOurSolution
         }
     }
 }
+        */

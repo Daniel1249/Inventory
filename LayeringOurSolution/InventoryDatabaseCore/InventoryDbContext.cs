@@ -14,11 +14,13 @@ namespace InventoryDatabaseCore
         public DbSet<Item> Items { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryColor> CategoryColors { get; set; }
+        public DbSet<CategoryDetail> CategoryDetails { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<GetItemsForListingDto> ItemsForListing { get; set; }
         public DbSet<AllItemsPipeDelimitedStringDto> AllItemsOutput { get; set; }
         public DbSet<GetItemsTotalValueDto> GetItemsTotalValues { get; set; }
         public DbSet<ItemsWithGenresDto> ItemsWithGenres { get; set; }
+        public DbSet<FullItemDetailDto> FullItemDetailDtos { get; set; }
         public InventoryDbContext() : base() { }
 
         public InventoryDbContext(DbContextOptions options)
@@ -29,6 +31,29 @@ namespace InventoryDatabaseCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity("InventoryModels.CategoryDetail", b =>
+            {
+                b.HasOne("InventoryModels.Category", "Category")
+                .WithOne("CategoryDetail")
+                .HasForeignKey("InventoryModels.CategoryDetail", "Id")
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+                b.Navigation("Category");
+            });
+
+            modelBuilder.Entity("InventoryModels.Category", b =>
+            {
+                b.Navigation("CategoryDetail");
+                b.Navigation("Items");
+            });
+
+
+            modelBuilder.Entity<FullItemDetailDto>(x =>
+            {
+                x.HasNoKey();
+                x.ToView("FullItemDetailDtos");
+            });
             //unique, non-clustered index for ItemGenre relationships
             modelBuilder.Entity<ItemGenre>()
                         .HasIndex(ig => new { ig.ItemId, ig.GenreId })

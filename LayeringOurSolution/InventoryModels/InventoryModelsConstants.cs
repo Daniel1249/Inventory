@@ -10,5 +10,6 @@
         public const double MINIMUM_PRICE = 0.0;
         public const double MAXIMUM_PRICE = 25000.0;
         public const int MAX_COLORVALUE_LENGTH = 7;
+        public const int MAX_COLORNAME_LENGTH = 17;
     }
 }

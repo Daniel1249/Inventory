@@ -12,5 +12,7 @@ namespace InventoryModels
         public virtual CategoryColor CategoryColor { get; set; }
         public int? CategoryColorId { get; set; }
 
+        public virtual CategoryDetail CategoryDetail { get; set; }
+
     }
 }

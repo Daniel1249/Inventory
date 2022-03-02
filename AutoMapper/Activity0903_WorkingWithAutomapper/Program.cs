@@ -32,14 +32,14 @@ namespace Activity0903_WorkingWithAutomapper
             //ListInventoryWithProjection();
 
 
-            GetItemsForListingLinq();
+            //GetItemsForListingLinq();
 
 
 
             //GetItemsForListingWithParams();
             //AllActiveItemsPipeDelimitedString();
             //GetItemsTotalValues();
-            //GetItemsWithGenres();
+            GetItemsWithGenres();
 
             // ListCategoriesAndColors();
         }

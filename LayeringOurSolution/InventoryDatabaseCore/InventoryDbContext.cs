@@ -16,6 +16,7 @@ namespace InventoryDatabaseCore
         public DbSet<CategoryColor> CategoryColors { get; set; }
         public DbSet<CategoryDetail> CategoryDetails { get; set; }
         public DbSet<Genre> Genres { get; set; }
+        public DbSet<Player> Players { get; set; }
         public DbSet<GetItemsForListingDto> ItemsForListing { get; set; }
         public DbSet<AllItemsPipeDelimitedStringDto> AllItemsOutput { get; set; }
         public DbSet<GetItemsTotalValueDto> GetItemsTotalValues { get; set; }

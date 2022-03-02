@@ -4,6 +4,8 @@ using InventoryModels.Dtos;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using InventoryModels;
+using System.Diagnostics;
 
 namespace InventoryDatabaseLayer
 {
@@ -16,11 +18,18 @@ namespace InventoryDatabaseLayer
             _context = context;
             _mapper = mapper;
         }
-        public List<ItemDto> GetItems()
+
+     
+        public List<Item> GetItems()
         {
-            var items = _context.Items.ProjectTo<ItemDto>(_mapper.ConfigurationProvider)
-                        .ToList();
-            return items;
+            // var items = _context.Items.ProjectTo<ItemDto>(_mapper.ConfigurationProvider)
+            //            .ToList();
+            //return items;
+
+            return _context.Items.Include(x => x.Category)
+                        .AsEnumerable()
+                        .Where(x => !x.IsDeleted)
+                        .OrderBy(x => x.Name).ToList();
         }
 
         public List<ItemDto> GetItemsByDateRange(DateTime minDateValue, DateTime maxDateValue)
@@ -55,5 +64,102 @@ namespace InventoryDatabaseLayer
                             .ThenBy(x => x.Category).ThenBy(x => x.PlayerName)
                             .ToList();
         }
+
+        public int UpsertItem(Item item)
+        {
+            if (item.Id > 0)
+            {
+                return UpdateItem(item);
+            }
+            return CreateItem(item);
+        }
+
+        public void UpsertItems(List<Item> items)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var item in items)
+                    {
+                        var success = UpsertItem(item) > 0;
+                        if (!success) throw new Exception($"Error saving the item { item.Name }");
+                    }
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    //log it:
+                    Debug.WriteLine(ex.ToString());
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
+
+    
+
+        public void DeleteItem(int id)
+        {
+            var item = _context.Items.FirstOrDefault(x => x.Id == id);
+            if (item == null) return;
+            item.IsDeleted = true;
+            _context.SaveChanges();
+        }
+
+        public void DeleteItems(List<int> itemIds)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var itemId in itemIds)
+                    {
+                        DeleteItem(itemId);
+                    }
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    //log it:
+                    Debug.WriteLine(ex.ToString());
+                    transaction.Rollback();
+                    throw ex;
+                    //make sure it is known that the transaction failed
+                }
+            }
+        }
+
+        private int CreateItem(Item item)
+        {
+            _context.Items.Add(item);
+            _context.SaveChanges();
+            var newItem = _context.Items.ToList()
+            .FirstOrDefault(x => x.Name.ToLower()
+            .Equals(item.Name.ToLower()));
+            if (newItem == null) throw new Exception("Could not Create the item as expected");
+            return newItem.Id;
+        }
+
+        private int UpdateItem(Item item)
+        {
+            var dbItem = _context.Items.FirstOrDefault(x => x.Id == item.Id);
+            dbItem.CategoryId = item.CategoryId;
+            dbItem.CurrentOrFinalPrice = item.CurrentOrFinalPrice;
+            dbItem.Description = item.Description;
+            dbItem.IsActive = item.IsActive;
+            dbItem.IsDeleted = item.IsDeleted;
+            dbItem.IsOnSale = item.IsOnSale;
+            dbItem.Name = item.Name;
+            dbItem.Notes = item.Notes;
+            dbItem.PurchasedDate = item.PurchasedDate;
+            dbItem.PurchasePrice = item.PurchasePrice;
+            dbItem.Quantity = item.Quantity;
+            dbItem.SoldDate = item.SoldDate;
+            _context.SaveChanges();
+            return item.Id;
+        }
+
     }
 }

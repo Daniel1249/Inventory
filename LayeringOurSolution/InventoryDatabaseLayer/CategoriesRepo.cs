@@ -26,7 +26,7 @@ namespace InventoryDatabaseLayer
         public List<CategoryDto> ListCategoriesAndDetails()
         {
             return _context.Categories
-                             //.Include(x => x.CategoryColor)
+                             .Include(x => x.CategoryColor)
                              .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider).ToList();
         }
     }

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using InventoryModels;
 using System.Diagnostics;
+using System.Transactions;
 
 namespace InventoryDatabaseLayer
 {
@@ -76,7 +77,9 @@ namespace InventoryDatabaseLayer
 
         public void UpsertItems(List<Item> items)
         {
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                        new TransactionOptions
+                { IsolationLevel = IsolationLevel.ReadUncommitted }))
             {
                 try
                 {
@@ -85,13 +88,12 @@ namespace InventoryDatabaseLayer
                         var success = UpsertItem(item) > 0;
                         if (!success) throw new Exception($"Error saving the item { item.Name }");
                     }
-                    transaction.Commit();
+                    scope.Complete();
                 }
                 catch (Exception ex)
                 {
                     //log it:
                     Debug.WriteLine(ex.ToString());
-                    transaction.Rollback();
                     throw;
                 }
             }
@@ -110,7 +112,9 @@ namespace InventoryDatabaseLayer
 
         public void DeleteItems(List<int> itemIds)
         {
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var scope = new TransactionScope(TransactionScopeOption.Required
+ , new TransactionOptions
+ { IsolationLevel = IsolationLevel.ReadUncommitted }))
             {
                 try
                 {
@@ -118,15 +122,13 @@ namespace InventoryDatabaseLayer
                     {
                         DeleteItem(itemId);
                     }
-                    transaction.Commit();
+                    scope.Complete();
                 }
                 catch (Exception ex)
                 {
                     //log it:
                     Debug.WriteLine(ex.ToString());
-                    transaction.Rollback();
-                    throw ex;
-                    //make sure it is known that the transaction failed
+                    throw; //make sure it is known that the transaction failed
                 }
             }
         }
